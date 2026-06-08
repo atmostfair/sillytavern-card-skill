@@ -76,6 +76,7 @@ Reject or revise a card before delivery when:
 - In Python f-strings, write doubled SillyTavern macros as `{{{{user}}}}` and `{{{{char}}}}`. Scan the whole generated card, including `system_prompt`, `post_history_instructions`, lorebook JSON blobs, and metadata, for bare `{user}` or `{char}`. Fix the generator and regenerate outputs when a collapse is found.
 - Do not speak or act for `{{user}}`.
 - Keep examples focused; demonstrate rhythm, relationship state, boundaries, and memory under different emotional conditions.
+- For roster-scale generated cards, do not reuse the same example scaffold unchanged across characters. Prefer replay/menu-specific memory anchors first, de-duplicate repeated one-story anchors, and convert third-person profile blurbs into natural first-person lines before placing them in `mes_example`.
 - Prefer 4-8 examples for high-fidelity cards. Each should start with `<START>`.
 - Put high-token worldbuilding in `character_book`, not permanent fields, but do not delete it to save tokens when fidelity matters.
 - If the user wants Chinese cards, write card prose in Chinese while keeping proper nouns unchanged.
