@@ -64,6 +64,8 @@ Treat a female character as substantial when any of these are true: she has a pr
 
 For Ren'Py projects with in-game profile systems, treat profile tables such as `Lady(...)`, `Girl(...)`, `LADIES_ORDER`, relationship screens, persistent character galleries, and replay lists as strong roster evidence. Include profile/gallery characters as standalone cards when they also have enough dialogue, route labels, or replay anchors to prevent OOC. If a profile/gallery character is real but thinner than the main cast, include it with `coverage_class: secondary` and explicit uncertainty/guardrails instead of fabricating strict-deep memories.
 
+A recurring female side or family character can qualify without a personal route when dialogue volume, relationship consequences, and decision authority are high enough to model a non-generic standalone voice. Use line counts and scene spread as audit evidence, not route ownership alone. Exclude or merge named women with only brief lore/commentary appearances when they lack independent relationship state and voice calibration.
+
 For the protagonist card, model the player-character's canon identity, relationships, route memories, decision style, and current-state assumptions. Do not confuse the protagonist card with the `{{user}}` macro in other character cards. If the protagonist is intentionally player-shaped with too little fixed personality, create a protagonist context/persona card that anchors known relationships and memories without inventing unsupported traits.
 
 ## Parallel Subagent Workflow
@@ -107,9 +109,11 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Treat lower-affection branches as inactive unless the user requests a specific route stage.
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
+   - For extracted-story-only projects with no `character_skills` or existing twins, create project-local evidence/twin packages before card JSON. Use per-character dialogue/context collection, line counts, route labels, metadata, and curated fact atoms; then write cards from those twins. Do not rely on the deterministic card builder alone when its expected dossier inputs are absent.
    - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
    - When subagents return structured character notes, persist those notes as a machine-readable project artifact and surface every major note field in `character_book`; do not leave the deepest evidence only in chat transcripts or temporary summaries.
    - If a character has substantial dialogue but appears in too few distinct story units to satisfy strict-deep coverage heuristics, mark the twin/card manifest with `coverage_class: secondary` and validate the package with regular twin checks. Do not fake per-story utterance coverage just to pass a strict validator.
+   - When generating fact IDs for hyphenated slugs, use an unambiguous delimiter or structured fields instead of parsing IDs with naive `split("-")`; otherwise hyphenated characters can lose source-event coverage during validation.
 
 4. Map evidence to SillyTavern fields.
    - `description`: source-grounded identity, relationship default, and current branch.
@@ -142,6 +146,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
    - Keep raw transcript/context caches separate from deliverables during placeholder scans. If a source excerpt contains placeholder-like text, do not treat it as a generated-card failure unless the marker appears in curated card/twin fields or deliverable evidence prose.
    - Avoid writing JSON `null` into generated cards, manifests, and curated evidence packs for unknown optional metadata. Omit the field or use a clear string such as `unknown_from_source`; otherwise broad placeholder scans can flag an otherwise valid package.
+   - Avoid echoing literal placeholder marker names into generated validation summaries after a successful scan; report the scan result generically or exclude non-deliverable logs deliberately so the report itself does not create the next false positive.
    - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
