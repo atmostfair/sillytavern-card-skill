@@ -120,6 +120,10 @@ print("cards passed")
 
 Generated cards, manifests, and curated evidence packs should avoid JSON `null` for unknown optional metadata. Omit the field or use a clear string such as `unknown_from_source`; broad placeholder scans often include `null`, and a single unknown age or unset field can otherwise make an import-ready package look unfinished. Keep raw transcript caches separate from curated deliverables when scanning for placeholders.
 
+For complete-roster manifests, make included and excluded records self-contained. Do not rely on a slug-only `included` list when the audit needs `gender_basis`, `story_volume_basis`, `evidence_paths`, coverage class, and output path; duplicate those compact fields onto the manifest's card records or included records so downstream review can validate coverage without joining against another section.
+
 Keep non-card coordinator artifacts out of the card directory root. The bundled validator scans every root-level `*.json` except `manifest.json` as a card, so put review reports, status summaries, and subagent logs in subdirectories such as `_review/` or `_subagent_reports/`.
 
 When deriving gallery/replay evidence from extracted Ren'Py manifests, accept both `gallery` and `gallery_replay` source-unit kinds. Some extraction pipelines label registered replay units as `gallery_replay`, and filtering only for `gallery` can produce false empty gallery-registration summaries even when replay text exists.
+
+When a roster run also emits project-local loaders such as `character_skills/*/SKILL.md`, include those loader files and generated twin evidence files in macro and placeholder scans. It is possible for ST card JSON to preserve `{{user}}` while a Python f-string Markdown template collapses the same macro to `{user}` in the loader, leaving downstream agents with inconsistent no-puppeting instructions.
