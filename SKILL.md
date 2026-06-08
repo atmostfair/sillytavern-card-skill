@@ -64,6 +64,37 @@ Use this skill for reusable card generation, not for generic character brainstor
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
    - Compare manifest coverage to the intended target characters.
 
+7. Iterate the skill before final response.
+   - Update this skill after every task. Capture newly learned reusable experience, source-layout quirks, field-mapping improvements, validation failures, prompt-quality issues, or precautions discovered while using the skill.
+   - Keep updates concise and reusable. Put durable workflow rules in `SKILL.md`, detailed SillyTavern format notes in `references/sillytavern-card-v2.md`, and deterministic fixes in `scripts/build_sillytavern_cards.py`.
+   - Do not add one-off project facts, user-private story spoilers, generated card prose, or bulky logs to the skill. Add only knowledge that improves future card-generation tasks.
+   - Re-run validation after any skill iteration.
+   - Commit the skill iteration and push it to GitHub before claiming the task is complete.
+
+## After Each Use
+
+Every use of this skill must end with a short maintenance pass:
+
+1. Review what happened during the task.
+   - Did a source layout, transcript format, Ren'Py extraction artifact, character dossier shape, SillyTavern import behavior, or validation failure reveal something future runs should know?
+   - Did the bundled script need a fix, option, or safer default?
+   - Did manual review find a recurring card-quality issue such as generic openings, branch drift, missing lorebook keys, bad macro escaping, or overlong permanent prompts?
+
+2. Update the skill when there is reusable learning.
+   - Edit `SKILL.md`, `references/sillytavern-card-v2.md`, or `scripts/build_sillytavern_cards.py` as appropriate.
+   - If there is no reusable learning, still record that decision in the final response after checking deliberately.
+
+3. Validate the updated skill.
+   - Run `quick_validate.py` on the skill folder.
+   - Run any changed bundled script on a small representative input when practical.
+   - Parse generated cards as JSON if script behavior changed.
+
+4. Push the iteration.
+   - Commit the skill update with a clear message.
+   - Push the skill repository to GitHub after each iteration.
+   - If there is no skill-file change after a deliberate maintenance pass, do not create an empty commit; report that there was no reusable update to push.
+   - If `git push` fails because authentication, remote configuration, or network access is unavailable, report the exact failure and leave the local commit intact.
+
 ## Bundled Script
 
 Use the script when a project already has structured character dossiers:
