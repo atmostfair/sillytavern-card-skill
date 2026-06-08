@@ -119,3 +119,7 @@ print("cards passed")
 ## Metadata Hygiene
 
 Generated cards, manifests, and curated evidence packs should avoid JSON `null` for unknown optional metadata. Omit the field or use a clear string such as `unknown_from_source`; broad placeholder scans often include `null`, and a single unknown age or unset field can otherwise make an import-ready package look unfinished. Keep raw transcript caches separate from curated deliverables when scanning for placeholders.
+
+Keep non-card coordinator artifacts out of the card directory root. The bundled validator scans every root-level `*.json` except `manifest.json` as a card, so put review reports, status summaries, and subagent logs in subdirectories such as `_review/` or `_subagent_reports/`.
+
+When deriving gallery/replay evidence from extracted Ren'Py manifests, accept both `gallery` and `gallery_replay` source-unit kinds. Some extraction pipelines label registered replay units as `gallery_replay`, and filtering only for `gallery` can produce false empty gallery-registration summaries even when replay text exists.
