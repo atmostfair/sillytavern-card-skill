@@ -93,6 +93,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
 1. Audit source files.
    - Find story order, speaker map, route variables, relationship screens, gallery/replay metadata, and existing character folders.
    - Prefer player-visible extracted text over raw code when both exist.
+   - On Windows/PowerShell, set console output encoding to UTF-8 before judging source text corruption; a legacy console codepage can make valid UTF-8 story files look mojibaked.
    - When no dossiers or twins exist but extracted story files and a speaker map do exist, first derive a roster from rendered speaker counts, story-file coverage, relationship variables, history variables, and per-character context windows before drafting cards.
    - Reconcile every target's aliases against the exact rendered speaker labels before finalizing coverage counts. Include full names, first names, titles, replay names, and protagonist thought labels where the transcript uses them; do not assume a dossier name matches the dialogue prefix.
    - If adult or explicit route scenes exist, preserve the source's explicitness level, vocabulary intensity, concrete acts when they affect characterization, consent or lack of consent, relationship state, boundaries, consequences, and character reactions. Do not sanitize explicit choreography into vague clinical summaries when it is evidence for voice, memory, preference, shame, trauma, intimacy, power dynamics, or OOC prevention.
@@ -114,6 +115,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
    - When subagents return structured character notes, persist those notes as a machine-readable project artifact and surface every major note field in `character_book`; do not leave the deepest evidence only in chat transcripts or temporary summaries.
    - If a character has substantial dialogue but appears in too few distinct story units to satisfy strict-deep coverage heuristics, mark the twin/card manifest with `coverage_class: secondary` and validate the package with regular twin checks. Do not fake per-story utterance coverage just to pass a strict validator.
+   - When producing strict-deep twins for cards, include a canonical `relationship_models.protagonist` section even if the story uses a project-specific player name or a named relationship edge. Keep the named edge too when useful, but downstream validators and card builders need the stable `protagonist` key for route-state checks.
    - When generating fact IDs for hyphenated slugs, use an unambiguous delimiter or structured fields instead of parsing IDs with naive `split("-")`; otherwise hyphenated characters can lose source-event coverage during validation.
 
 4. Map evidence to SillyTavern fields.
@@ -157,6 +159,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Fail the card if the first message could be used by a generic assistant or generic romance character.
    - Fail the set if multiple cards share the same voice template, catchphrases, emotional logic, or relationship assumptions without source evidence.
    - Scan visible calibration fields (`first_mes`, `mes_example`, `alternate_greetings`, and seed/fallback prose) for repeated scaffolding across cards. A schema-valid set still fails review when fallback greetings or examples are identical except for the character name.
+   - For complete roster runs, automate the visible-field duplicate scan when practical by normalizing each character's name and slug before comparing `first_mes`, `mes_example`, and `alternate_greetings`.
 
 7. Iterate the skill before final response.
    - Update this skill after every task. Capture newly learned reusable experience, source-layout quirks, field-mapping improvements, validation failures, prompt-quality issues, or precautions discovered while using the skill.
