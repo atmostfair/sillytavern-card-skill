@@ -1,4 +1,4 @@
 interface:
   display_name: "Generate SillyTavern Cards From Story"
   short_description: "Build high-fidelity ST cards from story."
-  default_prompt: "Use $generate-sillytavern-cards-from-story to create high-fidelity SillyTavern Character Card V2 digital twins from the available story text and character evidence."
+  default_prompt: "Use $generate-sillytavern-cards-from-story to create high-fidelity SillyTavern Character Card V2 digital twins from the available story text and character evidence. For complete roster runs, cover all substantial female characters plus the protagonist."

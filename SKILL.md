@@ -43,6 +43,37 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
 | `character_digital_twins/*/twin.json` plus evidence | Use the twins as source-of-truth and compress them into ST fields. |
 | User names specific characters | Generate only those cards. Do not create a card for every named side character. |
 
+## Target Coverage
+
+Unless the user explicitly limits the roster, generate cards for:
+
+- Every female character with substantial story volume.
+- The protagonist / player-character ("me") even when the protagonist has no normal speaker dossier.
+
+If the user explicitly asks for a narrow set, respect that scope and say the output is a partial roster run. Do not add the full cast unless the user asked for a complete roster.
+
+Treat a female character as substantial when any of these are true: she has a project-local character dossier or digital twin, she is a romance/PAX/route/gallery character, she has recurring relationship scenes with the protagonist, she appears across multiple plot scenes, or the extracted story gives enough dialogue/events to model voice, memory, and relationships. Determine gender from source evidence such as character metadata, pronouns, titles, relationship labels, route labels, portraits, or user instruction; do not infer only from names. Mark uncertain candidates as `needs_review` instead of silently excluding them. Exclude one-off NPCs, cameo-only names, and characters with too little evidence to prevent OOC; record exclusions in the manifest or final report.
+
+For the protagonist card, model the player-character's canon identity, relationships, route memories, decision style, and current-state assumptions. Do not confuse the protagonist card with the `{{user}}` macro in other character cards. If the protagonist is intentionally player-shaped with too little fixed personality, create a protagonist context/persona card that anchors known relationships and memories without inventing unsupported traits.
+
+## Parallel Subagent Workflow
+
+Use subagents for cast-wide generation when more than one target character qualifies and subagent tools are available. The purpose is speed and context isolation: each character's voice, memories, and relationship model should be built in a fresh context that is not polluted by another character's diction or emotional logic.
+
+When using subagents:
+
+- The coordinator first audits sources, builds the target roster, and prepares a small shared canon brief plus per-character evidence packs.
+- Dispatch one subagent per target character when practical. If the cast is large, shard by character groups, but never put characters with easily confused voices in the same subagent.
+- Give each subagent only the shared canon brief, target identity/aliases, inclusion reason, target source paths/fact IDs/twin/dossier, protagonist relationship default, language policy, ST V2 field requirements, target output path, and explicit avoid rules. Do not let subagents freely explore the whole project by default. Do not give them full cards for other characters except short relationship facts needed by the target.
+- Assign disjoint write scopes such as `<out-dir>/<slug>.json` or ask subagents to return structured drafts for the coordinator to write. Do not let multiple subagents edit the same manifest, comparison report, or shared script.
+- Require every subagent to return status (`DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED`), source coverage, uncertainty notes, and OOC risks for its character.
+- The coordinator reviews every returned card for source grounding, ST V2 compatibility, cross-character consistency, and voice contamination before delivery.
+- Borrow only the fresh-context, curated-input, status-handling, and review-loop ideas from subagent workflows. Do not import software-development mechanics such as TDD, branch policy, commits, or code-quality review into card generation tasks.
+
+If subagent tools are unavailable, do not silently collapse into one long mixed-character generation pass. Process each target in isolated local passes, state that subagents were unavailable, and preserve the same per-character evidence-pack discipline.
+
+For reusable subagent prompt templates and coordinator checklists, read `references/subagent-card-workflow.md` when generating more than one card.
+
 ## Card Workflow
 
 1. Audit source files.
@@ -52,8 +83,9 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
 
 2. Select target characters.
    - Use the user's requested characters when specified.
-   - Otherwise choose main route, PAX, romance, party, or recurring high-dialogue characters.
+   - Otherwise apply Target Coverage: all substantial female characters plus the protagonist/player-character.
    - Keep minor characters inside lorebook/context entries unless the user asks for standalone cards.
+   - Record candidate roster, included targets, excluded targets, `needs_review` targets, gender basis, story-volume basis, and reasons.
 
 3. Build evidence before prose.
    - For each card, collect identity, role, route state, current relationship, voice markers, speech rhythm, memories, motivations, fears, refusal lines, decision rules, and "do not write" rules.
@@ -61,6 +93,7 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
    - Treat lower-affection branches as inactive unless the user requests a specific route stage.
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
+   - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
 
 4. Map evidence to SillyTavern fields.
    - `description`: source-grounded identity, relationship default, and current branch.
@@ -89,10 +122,13 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
    - Check lorebook entries are enabled and have keys.
    - Run `scripts/validate_sillytavern_cards.py` for type-level SillyTavern V2 compatibility checks when a generated card directory exists.
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
-   - Compare manifest coverage to the intended target characters.
+   - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
+   - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
+   - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
    - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
    - Fail the card if examples sound interchangeable with another character.
    - Fail the card if the first message could be used by a generic assistant or generic romance character.
+   - Fail the set if multiple cards share the same voice template, catchphrases, emotional logic, or relationship assumptions without source evidence.
 
 7. Iterate the skill before final response.
    - Update this skill after every task. Capture newly learned reusable experience, source-layout quirks, field-mapping improvements, validation failures, prompt-quality issues, or precautions discovered while using the skill.
