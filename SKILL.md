@@ -113,6 +113,8 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
    - For extracted-story-only projects with no `character_skills` or existing twins, create project-local evidence/twin packages before card JSON. Use per-character dialogue/context collection, line counts, route labels, metadata, and curated fact atoms; then write cards from those twins. Do not rely on the deterministic card builder alone when its expected dossier inputs are absent.
+   - For source-only strict-deep twins, make fact atoms dense enough to audit the model. Use rendered source-unit and line references for dialogue evidence without copying large transcript text into card-visible fields just to meet evidence-count checks.
+   - If a strict-deep schema section is required but the source does not establish that domain, fill it with a source-limited absence note plus the nearest confirmed context instead of leaving it empty or inventing unsupported family/home/social facts.
    - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
    - When subagents return structured character notes, persist those notes as a machine-readable project artifact and surface every major note field in `character_book`; do not leave the deepest evidence only in chat transcripts or temporary summaries.
    - If a character has substantial dialogue but appears in too few distinct story units to satisfy strict-deep coverage heuristics, mark the twin/card manifest with `coverage_class: secondary` and validate the package with regular twin checks. Do not fake per-story utterance coverage just to pass a strict validator.
@@ -125,6 +127,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - `scenario`: world context, relationship state, route anchors, and default user role.
    - `first_mes`: one strong in-character opening based on current state.
    - `mes_example`: 2-5 short example exchanges that demonstrate voice without quoting canon.
+   - Keep internal review labels, evidence-purpose comments, and scaffold notes out of visible `mes_example`; store those annotations in twin metadata or validation reports instead.
    - `system_prompt`: roleplay contract, language policy, no user puppeting, no route reset.
    - `post_history_instructions`: branch drift guard and memory continuity.
    - `alternate_greetings`: 2-4 scene starters from different emotional registers.
