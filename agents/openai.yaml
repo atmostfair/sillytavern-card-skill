@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate SillyTavern Cards From Story"
+  short_description: "Build ST V2 cards from story evidence."
+  default_prompt: "Use $generate-sillytavern-cards-from-story to create SillyTavern Character Card V2 files from the available story text and character evidence."
