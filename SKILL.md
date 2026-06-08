@@ -94,6 +94,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
    - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
+   - If a character has substantial dialogue but appears in too few distinct story units to satisfy strict-deep coverage heuristics, mark the twin/card manifest with `coverage_class: secondary` and validate the package with regular twin checks. Do not fake per-story utterance coverage just to pass a strict validator.
 
 4. Map evidence to SillyTavern fields.
    - `description`: source-grounded identity, relationship default, and current branch.
@@ -122,6 +123,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Check lorebook entries are enabled and have keys.
    - Run `scripts/validate_sillytavern_cards.py` for type-level SillyTavern V2 compatibility checks when a generated card directory exists.
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
+   - Keep raw transcript/context caches separate from deliverables during placeholder scans. If a source excerpt contains placeholder-like text, do not treat it as a generated-card failure unless the marker appears in curated card/twin fields or deliverable evidence prose.
    - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
