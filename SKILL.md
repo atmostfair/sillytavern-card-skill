@@ -82,6 +82,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Find story order, speaker map, route variables, relationship screens, gallery/replay metadata, and existing character folders.
    - Prefer player-visible extracted text over raw code when both exist.
    - When no dossiers or twins exist but extracted story files and a speaker map do exist, first derive a roster from rendered speaker counts, story-file coverage, relationship variables, history variables, and per-character context windows before drafting cards.
+   - Reconcile every target's aliases against the exact rendered speaker labels before finalizing coverage counts. Include full names, first names, titles, replay names, and protagonist thought labels where the transcript uses them; do not assume a dossier name matches the dialogue prefix.
    - If adult route scenes exist, record consent, relationship state, boundaries, and consequences. Do not preserve explicit choreography unless the user explicitly requests mature route analysis.
 
 2. Select target characters.
@@ -111,6 +112,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - `alternate_greetings`: 2-4 scene starters from different emotional registers.
    - `character_book`: longer memories, world rules, relationship edges, and decision rules.
    - `extensions`: source metadata such as story version, fact counts, evidence paths, and generation notes.
+   - Sanity-check source version metadata. Some Ren'Py projects store engine tuples or internal build constants in `script_version.txt`; if the value is not a human content version, prefer a verified game folder/release label and record the raw version separately only as supporting evidence.
    - High-fidelity cards should use large `character_book` entries liberally. Token budget is secondary to in-character stability.
    - If a prior curated ST card exists, seed visible calibration fields from it (`description`, `personality`, `scenario`, `first_mes`, `mes_example`, `system_prompt`, `post_history_instructions`, `alternate_greetings`) while rebuilding the high-density lorebook from current evidence. Do not throw away a better voice calibration just because the knowledge layer is being regenerated.
 
