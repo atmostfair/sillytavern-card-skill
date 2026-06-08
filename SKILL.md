@@ -72,6 +72,8 @@ When using subagents:
 
 If subagent tools are unavailable, do not silently collapse into one long mixed-character generation pass. Process each target in isolated local passes, state that subagents were unavailable, and preserve the same per-character evidence-pack discipline.
 
+If subagent tools are technically discoverable but the current platform policy allows spawning only after an explicit user request for subagents/delegation, treat subagents as unauthorized for automatic use. Record that reason in the manifest or final report, then process targets in isolated local passes with the same per-character evidence-pack discipline.
+
 For reusable subagent prompt templates and coordinator checklists, read `references/subagent-card-workflow.md` when generating more than one card.
 
 ## Card Workflow
@@ -79,6 +81,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
 1. Audit source files.
    - Find story order, speaker map, route variables, relationship screens, gallery/replay metadata, and existing character folders.
    - Prefer player-visible extracted text over raw code when both exist.
+   - When no dossiers or twins exist but extracted story files and a speaker map do exist, first derive a roster from rendered speaker counts, story-file coverage, relationship variables, history variables, and per-character context windows before drafting cards.
    - If adult route scenes exist, record consent, relationship state, boundaries, and consequences. Do not preserve explicit choreography unless the user explicitly requests mature route analysis.
 
 2. Select target characters.
@@ -94,6 +97,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
    - For cast-wide work, build per-character evidence packs and send them to subagents instead of loading all characters into one drafting context.
+   - When subagents return structured character notes, persist those notes as a machine-readable project artifact and surface every major note field in `character_book`; do not leave the deepest evidence only in chat transcripts or temporary summaries.
    - If a character has substantial dialogue but appears in too few distinct story units to satisfy strict-deep coverage heuristics, mark the twin/card manifest with `coverage_class: secondary` and validate the package with regular twin checks. Do not fake per-story utterance coverage just to pass a strict validator.
 
 4. Map evidence to SillyTavern fields.
@@ -127,6 +131,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
+   - Scan generated JSON for accidentally collapsed SillyTavern macros such as bare `{user}` caused by Python f-strings; generated cards should preserve `{{user}}` and `{{char}}`.
    - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
    - Fail the card if examples sound interchangeable with another character.
    - Fail the card if the first message could be used by a generic assistant or generic romance character.
@@ -230,3 +235,5 @@ A card is acceptable only when:
 - Leaving a generic first message that ignores current relationship state.
 - Letting `{{user}}` be a stranger when the card is meant for late-route chat.
 - Making the card bilingual by accident. Choose a default language and state it.
+- Keeping high-quality subagent character notes outside the generated card files.
+- Accidentally collapsing `{{user}}` or `{{char}}` macros while building cards with f-strings.
