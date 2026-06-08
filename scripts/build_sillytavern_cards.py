@@ -45,6 +45,17 @@ TWIN_LORE_SECTIONS = [
     "validation",
 ]
 
+SEEDED_CALIBRATION_FIELDS = [
+    "description",
+    "personality",
+    "scenario",
+    "first_mes",
+    "mes_example",
+    "system_prompt",
+    "post_history_instructions",
+    "alternate_greetings",
+]
+
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -55,6 +66,16 @@ def read_json(path: Path) -> dict[str, Any] | None:
         return json.loads(read_text(path))
     except (OSError, json.JSONDecodeError):
         return None
+
+
+def read_seed_card(seed_cards_dir: Path | None, slug: str) -> dict[str, Any] | None:
+    if not seed_cards_dir:
+        return None
+    path = seed_cards_dir / f"{slug}.json"
+    card = read_json(path)
+    if not card:
+        return None
+    return card.get("data") if isinstance(card.get("data"), dict) else None
 
 
 def section(markdown: str, heading: str) -> str:
@@ -111,7 +132,7 @@ def profile_settings(profile: str) -> dict[str, Any]:
             "preserve_twin": False,
         }
     return {
-        "token_budget": 12000,
+        "token_budget": 20000,
         "scan_depth": 8,
         "constant_lore": True,
         "preserve_twin": True,
@@ -204,6 +225,7 @@ def build_card(
     manifest_item: dict[str, Any] | None,
     language: str,
     profile: str,
+    seed_card: dict[str, Any] | None,
 ) -> dict[str, Any]:
     markdown = read_text(skill_path)
     fm = frontmatter(markdown)
@@ -307,7 +329,7 @@ def build_card(
     if settings["preserve_twin"]:
         lore_entries.extend(build_twin_lore_entries(name, slug, twin, start_id=3, constant=True))
 
-    return {
+    card = {
         "spec": "chara_card_v2",
         "spec_version": "2.0",
         "data": {
@@ -341,6 +363,21 @@ def build_card(
             },
         },
     }
+    if seed_card:
+        data = card["data"]
+        seeded_fields: list[str] = []
+        for field in SEEDED_CALIBRATION_FIELDS:
+            value = seed_card.get(field)
+            if value not in (None, "", []):
+                data[field] = value
+                seeded_fields.append(field)
+        data["creator_notes"] += (
+            " Visible calibration fields were seeded from an existing curated card: "
+            + ", ".join(seeded_fields)
+            + "."
+        )
+        data["extensions"]["seeded_calibration_fields"] = seeded_fields
+    return card
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
@@ -355,6 +392,7 @@ def main() -> None:
     parser.add_argument("--out-dir", default="sillytavern_cards", help="Output directory relative to project root.")
     parser.add_argument("--language", choices=["zh", "en"], default="zh", help="Default card prose language.")
     parser.add_argument("--profile", choices=["fidelity", "compact"], default="fidelity", help="Generation profile. fidelity preserves high-density twin.json lore and prioritizes OOC resistance over token economy.")
+    parser.add_argument("--seed-cards-dir", default=None, help="Optional directory of existing ST V2 cards. When present, preserve curated visible calibration fields such as first_mes and mes_example while rebuilding high-density lorebook data.")
     parser.add_argument("--character", action="append", default=[], help="Character slug to generate. Repeat for multiple.")
     args = parser.parse_args()
 
@@ -362,6 +400,7 @@ def main() -> None:
     characters_dir = root / args.characters_dir
     twins_dir = root / args.twins_dir
     out_dir = root / args.out_dir
+    seed_cards_dir = (root / args.seed_cards_dir) if args.seed_cards_dir else None
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if not characters_dir.exists():
@@ -374,7 +413,8 @@ def main() -> None:
         if not skill_path.exists():
             raise SystemExit(f"missing SKILL.md for character: {char_dir}")
         slug = char_dir.name
-        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language, args.profile)
+        seed_card = read_seed_card(seed_cards_dir, slug)
+        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language, args.profile, seed_card)
         file_name = f"{slug}.json"
         write_json(out_dir / file_name, card)
         rows.append(
@@ -385,6 +425,7 @@ def main() -> None:
                 "spec": card["spec"],
                 "spec_version": card["spec_version"],
                 "profile": args.profile,
+                "seeded_calibration_fields": card["data"]["extensions"].get("seeded_calibration_fields", []),
             }
         )
 

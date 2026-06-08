@@ -74,6 +74,7 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
    - `character_book`: longer memories, world rules, relationship edges, and decision rules.
    - `extensions`: source metadata such as story version, fact counts, evidence paths, and generation notes.
    - High-fidelity cards should use large `character_book` entries liberally. Token budget is secondary to in-character stability.
+   - If a prior curated ST card exists, seed visible calibration fields from it (`description`, `personality`, `scenario`, `first_mes`, `mes_example`, `system_prompt`, `post_history_instructions`, `alternate_greetings`) while rebuilding the high-density lorebook from current evidence. Do not throw away a better voice calibration just because the knowledge layer is being regenerated.
 
 5. Write compactly.
    - Use the user's language for card prose unless requested otherwise.
@@ -134,10 +135,11 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
   --twins-dir character_digital_twins `
   --out-dir sillytavern_cards `
   --language zh `
-  --profile fidelity
+  --profile fidelity `
+  --seed-cards-dir sillytavern_cards
 ```
 
-The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
+The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. With `--seed-cards-dir`, it preserves curated visible fields from an earlier good card while replacing the knowledge layer with the high-fidelity model. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
 
 Use `--character slug` repeatedly to restrict output:
 

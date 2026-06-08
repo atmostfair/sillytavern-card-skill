@@ -54,6 +54,8 @@ High-fidelity cards should include:
 
 If `character_digital_twins/<slug>/twin.json` exists, preserve the high-value nested sections in `character_book` instead of flattening them away. Important sections usually include `identity`, `personality`, `voice`, `likes_dislikes`, `life_history`, `psychological_model`, `social_model`, `relationship_models`, `memory_bank`, `boundaries`, `behavioral_rules`, `decision_rules`, `scene_generation_model`, `chat_model`, and `validation`.
 
+When an earlier ST card has stronger manually curated visible calibration, keep those visible fields and regenerate the knowledge layer. Good seed fields are `description`, `personality`, `scenario`, `first_mes`, `mes_example`, `system_prompt`, `post_history_instructions`, and `alternate_greetings`. This is especially useful when a deterministic script can preserve facts but cannot yet write character-specific openings as well as a manual pass.
+
 ## OOC Failure Gates
 
 Reject or revise a card before delivery when:
