@@ -32,6 +32,7 @@ The coordinator owns global consistency and final delivery. Do not delegate thes
    - Use fresh context. In Codex multi-agent tools, prefer `fork_context: false` and pass explicit files/briefs.
    - Give each subagent a disjoint write path or ask for a structured draft only.
    - Do not let subagents edit shared manifests, scripts, or reports.
+   - If the runtime exposes subagent tools but their tool policy requires explicit user authorization before spawning, do not spawn agents unless the user made that authorization. Record the constraint and run isolated local character passes instead.
 
 5. Integrate.
    - Review every returned card before accepting it.
@@ -63,6 +64,8 @@ Exclusion signals:
 - Not enough evidence to prevent generic behavior.
 
 When story volume is uncertain, use the scoring rubric and record the decision. When gender is uncertain, put the candidate in `needs_review` unless the user resolves it. Include a borderline candidate only if the subagent can build concrete memories, relationships, and voice rules without inventing.
+
+In Ren'Py projects, in-game character profile systems and gallery/replay lists are roster evidence. Treat records such as `Lady(...)`, `Girl(...)`, `LADIES_ORDER`, relationship/contact screens, persistent profile galleries, and replay scene titles as strong candidate signals, then confirm the candidate with dialogue volume, chapter coverage, labels, or relationship events. Use `coverage_class: secondary` for real profile/gallery characters whose evidence is narrower than the main cast.
 
 ### Roster Scoring Rubric
 

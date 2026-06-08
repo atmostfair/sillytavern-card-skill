@@ -62,6 +62,8 @@ If the user explicitly asks for a narrow set, respect that scope and say the out
 
 Treat a female character as substantial when any of these are true: she has a project-local character dossier or digital twin, she is a romance/PAX/route/gallery character, she has recurring relationship scenes with the protagonist, she appears across multiple plot scenes, or the extracted story gives enough dialogue/events to model voice, memory, and relationships. Determine gender from source evidence such as character metadata, pronouns, titles, relationship labels, route labels, portraits, or user instruction; do not infer only from names. Mark uncertain candidates as `needs_review` instead of silently excluding them. Exclude one-off NPCs, cameo-only names, and characters with too little evidence to prevent OOC; record exclusions in the manifest or final report.
 
+For Ren'Py projects with in-game profile systems, treat profile tables such as `Lady(...)`, `Girl(...)`, `LADIES_ORDER`, relationship screens, persistent character galleries, and replay lists as strong roster evidence. Include profile/gallery characters as standalone cards when they also have enough dialogue, route labels, or replay anchors to prevent OOC. If a profile/gallery character is real but thinner than the main cast, include it with `coverage_class: secondary` and explicit uncertainty/guardrails instead of fabricating strict-deep memories.
+
 For the protagonist card, model the player-character's canon identity, relationships, route memories, decision style, and current-state assumptions. Do not confuse the protagonist card with the `{{user}}` macro in other character cards. If the protagonist is intentionally player-shaped with too little fixed personality, create a protagonist context/persona card that anchors known relationships and memories without inventing unsupported traits.
 
 ## Parallel Subagent Workflow
@@ -139,6 +141,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Run `scripts/validate_sillytavern_cards.py` for type-level SillyTavern V2 compatibility checks when a generated card directory exists.
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
    - Keep raw transcript/context caches separate from deliverables during placeholder scans. If a source excerpt contains placeholder-like text, do not treat it as a generated-card failure unless the marker appears in curated card/twin fields or deliverable evidence prose.
+   - Avoid writing JSON `null` into generated cards, manifests, and curated evidence packs for unknown optional metadata. Omit the field or use a clear string such as `unknown_from_source`; otherwise broad placeholder scans can flag an otherwise valid package.
    - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
@@ -147,6 +150,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Fail the card if examples sound interchangeable with another character.
    - Fail the card if the first message could be used by a generic assistant or generic romance character.
    - Fail the set if multiple cards share the same voice template, catchphrases, emotional logic, or relationship assumptions without source evidence.
+   - Scan visible calibration fields (`first_mes`, `mes_example`, `alternate_greetings`, and seed/fallback prose) for repeated scaffolding across cards. A schema-valid set still fails review when fallback greetings or examples are identical except for the character name.
 
 7. Iterate the skill before final response.
    - Update this skill after every task. Capture newly learned reusable experience, source-layout quirks, field-mapping improvements, validation failures, prompt-quality issues, or precautions discovered while using the skill.

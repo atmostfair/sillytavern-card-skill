@@ -113,3 +113,7 @@ for path in Path("sillytavern_cards").glob("*.json"):
 print("cards passed")
 '@ | python -
 ```
+
+## Metadata Hygiene
+
+Generated cards, manifests, and curated evidence packs should avoid JSON `null` for unknown optional metadata. Omit the field or use a clear string such as `unknown_from_source`; broad placeholder scans often include `null`, and a single unknown age or unset field can otherwise make an import-ready package look unfinished. Keep raw transcript caches separate from curated deliverables when scanning for placeholders.
