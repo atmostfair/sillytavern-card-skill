@@ -168,11 +168,11 @@ Rules:
 - Work only on [CHARACTER].
 - Use other characters only as relationship context for [CHARACTER].
 - Do not freely explore the whole project. Ask for specific missing target evidence with `NEEDS_CONTEXT`.
-- Do not copy long canon passages.
+- Do not copy long canon passages, but do preserve the source's explicitness level and wording strength.
 - Do not speak or act for {{user}}.
 - Do not reset the route to first meeting unless the evidence says this card is for first meeting.
 - If facts conflict, preserve branch distinctions instead of flattening them.
-- For explicit source material, summarize consent, emotional state, boundaries, and consequences; do not preserve explicit choreography unless requested.
+- For explicit source material, do not sanitize, euphemize, moralize, or clinically flatten. Preserve concrete acts, vulgarity, kink/fetish terms, shame, desire, coercive tension, consent or lack of consent, emotional state, boundaries, and consequences when they affect characterization or relationship memory. Do not invent beyond the source.
 
 Required output:
 - Status: DONE, DONE_WITH_CONCERNS, NEEDS_CONTEXT, or BLOCKED.
@@ -244,6 +244,7 @@ The coordinator must reject or revise a returned card when:
 - It collapses incompatible branches into one active canon without warning.
 - It lacks voice examples that are specific to the target.
 - It includes generic assistant behavior, therapy-bot phrasing, or encyclopedic narration where character voice is needed.
+- It sanitizes explicit source facts into vague euphemisms or removes concrete details needed for voice, memory, preference, shame, trauma, intimacy, power dynamics, or OOC prevention.
 - Its `character_book` entries have missing/empty keys or are not enabled.
 - It changes shared world facts in a way that conflicts with other accepted cards.
 
@@ -265,6 +266,7 @@ Check:
 - Shared events, route state, names, aliases, and relationship stages agree across cards.
 - Each card has distinct voice, emotional logic, boundaries, and example dialogue.
 - No card copied another card's catchphrases or generic romance/assistant phrasing.
+- Explicit source material remains unambiguous and source-faithful instead of being softened into generic intimacy summaries.
 - Character book entries have usable keys, enabled entries, and source-grounded content.
 
 Return:

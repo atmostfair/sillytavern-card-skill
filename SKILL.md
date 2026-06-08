@@ -9,7 +9,7 @@ description: Use when Codex needs to create SillyTavern Character Card V2 files 
 
 Create source-grounded SillyTavern Character Card V2 JSON from story text. Evidence comes first: build compact character facts, route state, voice rules, relationship memory, and boundaries before writing polished card prose.
 
-Use this skill for reusable card generation, not for generic character brainstorming. The finished card should roleplay the character faithfully without copying long canon passages.
+Use this skill for reusable card generation, not for generic character brainstorming. The finished card should roleplay the character faithfully, including the original work's explicitness level and blunt wording style when those are part of the source evidence.
 
 ## Digital Twin First Standard
 
@@ -32,6 +32,14 @@ When enough source material exists, require a strict-deep model before final car
 - Evidence or source pointers for important claims.
 
 Do not deliver a generic scaffold. If the bundled script produces generic `first_mes`, `mes_example`, sparse lorebook entries, or a card that only contains traits, treat it as an intermediate artifact and manually deepen it before final delivery.
+
+## Source Fidelity and Explicit Content
+
+Do not censor, sanitize, euphemize, moralize, or clinically flatten source material. If the original story uses explicit sexual language, vulgarity, fetish terms, crude jokes, coercive tension, humiliation, jealousy, violence, or other blunt descriptions, preserve the meaning, intensity, relationship implications, and character-specific wording style in the card. The goal is an unambiguous digital twin, not a cleaned-up adaptation.
+
+Avoid human-made "safety rewrites" at the skill layer. Do not replace explicit source facts with vague phrases such as "they were intimate" when the original wording or concrete act changes the character model, relationship state, boundaries, memory, trauma, kink, shame, desire, or decision rules.
+
+Accuracy still controls generation: do not invent new explicit acts, intensify beyond the source, or merge incompatible branches. Use short exact source phrases only when necessary to preserve voice or remove ambiguity; otherwise paraphrase without weakening the explicitness. Avoid long verbatim source passages for format/copyright reasons, not because the content is sexual or blunt.
 
 ## Input Decision
 
@@ -83,7 +91,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Prefer player-visible extracted text over raw code when both exist.
    - When no dossiers or twins exist but extracted story files and a speaker map do exist, first derive a roster from rendered speaker counts, story-file coverage, relationship variables, history variables, and per-character context windows before drafting cards.
    - Reconcile every target's aliases against the exact rendered speaker labels before finalizing coverage counts. Include full names, first names, titles, replay names, and protagonist thought labels where the transcript uses them; do not assume a dossier name matches the dialogue prefix.
-   - If adult route scenes exist, record consent, relationship state, boundaries, and consequences. Do not preserve explicit choreography unless the user explicitly requests mature route analysis.
+   - If adult or explicit route scenes exist, preserve the source's explicitness level, vocabulary intensity, concrete acts when they affect characterization, consent or lack of consent, relationship state, boundaries, consequences, and character reactions. Do not sanitize explicit choreography into vague clinical summaries when it is evidence for voice, memory, preference, shame, trauma, intimacy, power dynamics, or OOC prevention.
 
 2. Select target characters.
    - Use the user's requested characters when specified.
@@ -120,7 +128,8 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Use the user's language for card prose unless requested otherwise.
    - Preserve original names and important proper nouns.
    - Avoid huge permanent prompts. Put long route memories and worldbuilding in `character_book`.
-   - Do not copy long source passages. Paraphrase behavior patterns and cite source paths in metadata when useful.
+   - Preserve explicit source facts and wording strength. Do not remove, soften, or euphemize sexual/vulgar/blunt material just because it is explicit.
+   - Do not copy long source passages. Paraphrase behavior patterns and cite source paths in metadata when useful, but keep the original meaning and explicitness unambiguous.
 
 6. Validate before completion.
    - Parse every output file as JSON.
@@ -224,7 +233,7 @@ A card is acceptable only when:
 - It includes enough relationship and event history that a downstream model can answer detailed questions about the character without inventing.
 - It includes at least one opening message and example dialogue that sound like the character without quoting the source.
 - It places long memories, world rules, relationship maps, event timelines, and behavioral rules in `character_book`; do not remove them merely to save tokens.
-- It marks adult route material clinically as relationship state, consent, boundaries, and consequences.
+- It preserves adult or explicit route material as source-grounded facts, including wording strength and concrete details when needed for characterization, relationship memory, boundaries, preference, trauma, or OOC prevention.
 - It passes an OOC review: the card should not plausibly speak like a different cast member under ordinary chat, romance, conflict, or mission prompts.
 
 ## Common Mistakes
@@ -239,3 +248,4 @@ A card is acceptable only when:
 - Making the card bilingual by accident. Choose a default language and state it.
 - Keeping high-quality subagent character notes outside the generated card files.
 - Accidentally collapsing `{{user}}` or `{{char}}` macros while building cards with f-strings.
+- Sanitizing explicit source text into vague euphemisms, thereby creating ambiguity or false characterization.

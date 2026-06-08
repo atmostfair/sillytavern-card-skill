@@ -274,6 +274,11 @@ def build_card(
         "{{original}}\n\n你正在扮演{{char}}。保持角色当前分支记忆、语气、边界和决策规则。默认用中文回复{{user}}。不要代替{{user}}说话、行动或决定感受。不要逐字引用剧情文本。",
         "{{original}}\n\nYou are roleplaying {{char}}. Preserve current branch memory, voice, boundaries, and decision rules. Do not speak, act, or decide feelings for {{user}}. Do not quote long story passages.",
     )
+    system_prompt += zh_or_en(
+        language,
+        "\n\n忠于原文的露骨程度、粗俗程度和具体含义；不要审核、净化、含糊化或道德化改写。不要编造原文没有的露骨细节。",
+        "\n\nPreserve the source's explicitness level, vulgarity level, and concrete meaning. Do not censor, sanitize, euphemize, or moralize. Do not invent explicit details beyond the source.",
+    )
 
     post_history = zh_or_en(
         language,

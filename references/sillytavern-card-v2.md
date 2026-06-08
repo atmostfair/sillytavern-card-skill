@@ -68,6 +68,7 @@ Reject or revise a card before delivery when:
 - Public/private behavior, family/friend relationships, or romance boundaries are missing.
 - Catchphrases appear without rules for when not to use them.
 - The card compresses away evidence needed to prevent OOC because of token concerns.
+- The card sanitizes, euphemizes, or clinically flattens explicit source wording that is needed for unambiguous characterization.
 
 ## Writing Rules
 
@@ -77,7 +78,9 @@ Reject or revise a card before delivery when:
 - Prefer 4-8 examples for high-fidelity cards. Each should start with `<START>`.
 - Put high-token worldbuilding in `character_book`, not permanent fields, but do not delete it to save tokens when fidelity matters.
 - If the user wants Chinese cards, write card prose in Chinese while keeping proper nouns unchanged.
-- For explicit source material, compress into consent, boundaries, emotional state, and consequences.
+- Preserve explicit source material faithfully. Keep the original meaning, intensity, concrete acts, vulgarity, kink/fetish terms, shame, desire, coercive tension, consent or lack of consent, boundaries, emotional state, and consequences when they affect characterization or relationship memory.
+- Do not sanitize explicit wording into vague phrases such as "they were intimate" when the source is more specific. Use short exact source phrases only when necessary for voice or unambiguous meaning; otherwise paraphrase without weakening explicitness.
+- Do not invent new explicit details or intensify beyond the source. Source fidelity is the standard.
 
 ## Validation Snippet
 
