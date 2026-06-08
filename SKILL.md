@@ -95,6 +95,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Prefer player-visible extracted text over raw code when both exist.
    - On Windows/PowerShell, set console output encoding to UTF-8 before judging source text corruption; a legacy console codepage can make valid UTF-8 story files look mojibaked.
    - When no dossiers or twins exist but extracted story files and a speaker map do exist, first derive a roster from rendered speaker counts, story-file coverage, relationship variables, history variables, and per-character context windows before drafting cards.
+   - Support both bracketed speaker tags (`[Name]`) and colon-prefixed transcript lines (`Name:` / `Name (thought):`) when deriving speaker counts. Exclude extraction metadata headers such as `Source:` and `Ordering evidence:` so they are not mistaken for characters.
    - Reconcile every target's aliases against the exact rendered speaker labels before finalizing coverage counts. Include full names, first names, titles, replay names, and protagonist thought labels where the transcript uses them; do not assume a dossier name matches the dialogue prefix.
    - If adult or explicit route scenes exist, preserve the source's explicitness level, vocabulary intensity, concrete acts when they affect characterization, consent or lack of consent, relationship state, boundaries, consequences, and character reactions. Do not sanitize explicit choreography into vague clinical summaries when it is evidence for voice, memory, preference, shame, trauma, intimacy, power dynamics, or OOC prevention.
 
@@ -153,7 +154,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Compare manifest coverage to the intended target characters, including every substantial female character and the protagonist unless the user narrowed scope.
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
-   - Scan generated JSON for accidentally collapsed SillyTavern macros such as bare `{user}` caused by Python f-strings; generated cards should preserve `{{user}}` and `{{char}}`.
+   - Scan generated JSON for accidentally collapsed SillyTavern macros such as bare `{user}` caused by Python f-strings; generated cards should preserve `{{user}}` and `{{char}}` in visible fields, support fields, lorebook content, and encoded/generated metadata. If a generator caused the collapse, fix the generator and regenerate instead of hand-patching card JSON.
    - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
    - Fail the card if examples sound interchangeable with another character.
    - Fail the card if the first message could be used by a generic assistant or generic romance character.

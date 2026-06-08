@@ -73,6 +73,7 @@ Reject or revise a card before delivery when:
 ## Writing Rules
 
 - Use `{{char}}` and `{{user}}` macros where helpful.
+- In Python f-strings, write doubled SillyTavern macros as `{{{{user}}}}` and `{{{{char}}}}`. Scan the whole generated card, including `system_prompt`, `post_history_instructions`, lorebook JSON blobs, and metadata, for bare `{user}` or `{char}`. Fix the generator and regenerate outputs when a collapse is found.
 - Do not speak or act for `{{user}}`.
 - Keep examples focused; demonstrate rhythm, relationship state, boundaries, and memory under different emotional conditions.
 - Prefer 4-8 examples for high-fidelity cards. Each should start with `<START>`.
