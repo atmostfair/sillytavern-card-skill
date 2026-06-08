@@ -22,6 +22,29 @@ SECTIONS = [
     "Avoid",
 ]
 
+TWIN_LORE_SECTIONS = [
+    "source_coverage",
+    "canon_anchors",
+    "identity",
+    "personality",
+    "voice",
+    "likes_dislikes",
+    "history",
+    "life_history",
+    "psychological_model",
+    "social_model",
+    "relationships",
+    "relationship_models",
+    "boundaries",
+    "behavioral_rules",
+    "decision_rules",
+    "story_generation_rules",
+    "scene_generation_model",
+    "chat_model",
+    "memory_bank",
+    "validation",
+]
+
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -79,6 +102,65 @@ def character_from_twin(twin: dict[str, Any] | None, fallback_name: str) -> tupl
     return full_name, short_name, project
 
 
+def profile_settings(profile: str) -> dict[str, Any]:
+    if profile == "compact":
+        return {
+            "token_budget": 1800,
+            "scan_depth": 4,
+            "constant_lore": False,
+            "preserve_twin": False,
+        }
+    return {
+        "token_budget": 12000,
+        "scan_depth": 8,
+        "constant_lore": True,
+        "preserve_twin": True,
+    }
+
+
+def compact_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)
+
+
+def build_twin_lore_entries(
+    name: str,
+    slug: str,
+    twin: dict[str, Any] | None,
+    start_id: int,
+    constant: bool,
+) -> list[dict[str, Any]]:
+    if not twin:
+        return []
+
+    entries: list[dict[str, Any]] = []
+    order = 200
+    entry_id = start_id
+    for section_name in TWIN_LORE_SECTIONS:
+        value = twin.get(section_name)
+        if value in (None, "", [], {}):
+            continue
+        entries.append(
+            {
+                "id": entry_id,
+                "name": f"{name} twin {section_name}",
+                "comment": "High-fidelity digital twin material preserved from twin.json.",
+                "keys": [name, slug, section_name, "digital twin", "fidelity", "canon"],
+                "secondary_keys": [],
+                "content": f"[{name} / {section_name}]\n{compact_json(value)}",
+                "constant": constant,
+                "selective": False,
+                "enabled": True,
+                "insertion_order": order,
+                "case_sensitive": False,
+                "position": "before_char",
+                "extensions": {},
+            }
+        )
+        entry_id += 1
+        order += 10
+    return entries
+
+
 def zh_or_en(language: str, zh: str, en: str) -> str:
     return zh if language == "zh" else en
 
@@ -121,6 +203,7 @@ def build_card(
     twin_path: Path,
     manifest_item: dict[str, Any] | None,
     language: str,
+    profile: str,
 ) -> dict[str, Any]:
     markdown = read_text(skill_path)
     fm = frontmatter(markdown)
@@ -132,6 +215,7 @@ def build_card(
     sec = {heading: section(markdown, heading) for heading in SECTIONS}
     facts = manifest_item.get("facts") if manifest_item else None
     dialogue_count = manifest_item.get("dialogue_line_count") if manifest_item else None
+    settings = profile_settings(profile)
 
     description = zh_or_en(
         language,
@@ -184,10 +268,44 @@ def build_card(
             "twin_path": str(twin_path) if twin_path.exists() else None,
             "facts": facts,
             "dialogue_line_count": dialogue_count,
+            "profile": profile,
         },
         ensure_ascii=False,
         sort_keys=True,
     )
+
+    lore_entries: list[dict[str, Any]] = [
+        {
+            "id": 1,
+            "name": f"{name} memory",
+            "keys": [name, slug, "memory", "route", "past"],
+            "secondary_keys": [],
+            "content": memory,
+            "constant": settings["constant_lore"],
+            "selective": False,
+            "enabled": True,
+            "insertion_order": 100,
+            "case_sensitive": False,
+            "position": "before_char",
+            "extensions": {},
+        },
+        {
+            "id": 2,
+            "name": f"{name} voice and choices",
+            "keys": [name, slug, "voice", "dialogue", "decision", "boundary"],
+            "secondary_keys": [],
+            "content": voice_rules,
+            "constant": settings["constant_lore"],
+            "selective": False,
+            "enabled": True,
+            "insertion_order": 110,
+            "case_sensitive": False,
+            "position": "before_char",
+            "extensions": {},
+        },
+    ]
+    if settings["preserve_twin"]:
+        lore_entries.extend(build_twin_lore_entries(name, slug, twin, start_id=3, constant=True))
 
     return {
         "spec": "chara_card_v2",
@@ -199,7 +317,7 @@ def build_card(
             "scenario": scenario,
             "first_mes": first_mes,
             "mes_example": build_examples(language),
-            "creator_notes": f"Generated from local story-derived character evidence for {project}. Review first_mes and mes_example manually before publishing.",
+            "creator_notes": f"Generated from local story-derived character evidence for {project} with profile={profile}. In fidelity mode, twin.json sections are preserved in character_book for maximum in-character stability. Review and replace generic first_mes and mes_example manually before publishing.",
             "system_prompt": system_prompt,
             "post_history_instructions": post_history,
             "alternate_greetings": build_alt_greetings(language),
@@ -210,44 +328,16 @@ def build_card(
                 "source_grounding_b64": base64.b64encode(source_blob.encode("utf-8")).decode("ascii"),
                 "facts": facts,
                 "dialogue_line_count": dialogue_count,
+                "profile": profile,
             },
             "character_book": {
                 "name": f"{name} Lorebook",
-                "description": "Source-grounded memories, voice rules, and decision rules.",
-                "scan_depth": 4,
-                "token_budget": 1400,
-                "recursive_scanning": False,
+                "description": "Source-grounded memories, voice rules, relationship models, event history, and digital twin rules.",
+                "scan_depth": settings["scan_depth"],
+                "token_budget": settings["token_budget"],
+                "recursive_scanning": profile == "fidelity",
                 "extensions": {},
-                "entries": [
-                    {
-                        "id": 1,
-                        "name": f"{name} memory",
-                        "keys": [name, slug, "memory", "route", "past"],
-                        "secondary_keys": [],
-                        "content": memory,
-                        "constant": False,
-                        "selective": False,
-                        "enabled": True,
-                        "insertion_order": 100,
-                        "case_sensitive": False,
-                        "position": "before_char",
-                        "extensions": {},
-                    },
-                    {
-                        "id": 2,
-                        "name": f"{name} voice and choices",
-                        "keys": [name, slug, "voice", "dialogue", "decision", "boundary"],
-                        "secondary_keys": [],
-                        "content": voice_rules,
-                        "constant": False,
-                        "selective": False,
-                        "enabled": True,
-                        "insertion_order": 110,
-                        "case_sensitive": False,
-                        "position": "before_char",
-                        "extensions": {},
-                    },
-                ],
+                "entries": lore_entries,
             },
         },
     }
@@ -264,6 +354,7 @@ def main() -> None:
     parser.add_argument("--twins-dir", default="character_digital_twins", help="Directory of digital twin folders relative to project root.")
     parser.add_argument("--out-dir", default="sillytavern_cards", help="Output directory relative to project root.")
     parser.add_argument("--language", choices=["zh", "en"], default="zh", help="Default card prose language.")
+    parser.add_argument("--profile", choices=["fidelity", "compact"], default="fidelity", help="Generation profile. fidelity preserves high-density twin.json lore and prioritizes OOC resistance over token economy.")
     parser.add_argument("--character", action="append", default=[], help="Character slug to generate. Repeat for multiple.")
     args = parser.parse_args()
 
@@ -283,7 +374,7 @@ def main() -> None:
         if not skill_path.exists():
             raise SystemExit(f"missing SKILL.md for character: {char_dir}")
         slug = char_dir.name
-        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language)
+        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language, args.profile)
         file_name = f"{slug}.json"
         write_json(out_dir / file_name, card)
         rows.append(
@@ -293,6 +384,7 @@ def main() -> None:
                 "name": card["data"]["name"],
                 "spec": card["spec"],
                 "spec_version": card["spec_version"],
+                "profile": args.profile,
             }
         )
 

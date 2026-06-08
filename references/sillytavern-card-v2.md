@@ -34,13 +34,46 @@ Recommended optional fields: `creator_notes`, `system_prompt`, `post_history_ins
 | Route drift guard | `post_history_instructions` |
 | Long memories, world rules, route details | `character_book.entries` |
 
+## High-Fidelity Profile
+
+For digital-twin cards, token budget is secondary. Prefer a larger, more reliable card over a compact card that drifts OOC. Use `character_book.token_budget` in the 8000-20000 range when the target model and SillyTavern setup can tolerate it.
+
+High-fidelity cards should include:
+
+- Full identity and alias logic.
+- Core contradictions and personality model.
+- Likes, dislikes, routines, hobbies, motifs, and comfort objects.
+- Event timeline and memory bank, including state changes.
+- Relationship maps for protagonist, family, friends, rivals, factions, and recurring side characters.
+- Current branch state plus inactive alternate branch warnings.
+- Voice model with rhythm, register, vocabulary, taboo phrasing, and overuse warnings.
+- Scene-generation rules for daily life, romance, conflict, danger, grief, intimacy, public scenes, and private scenes.
+- Behavioral decision rules and refusal rules.
+- Hard OOC guardrails.
+- Source metadata or fact IDs for important claims.
+
+If `character_digital_twins/<slug>/twin.json` exists, preserve the high-value nested sections in `character_book` instead of flattening them away. Important sections usually include `identity`, `personality`, `voice`, `likes_dislikes`, `life_history`, `psychological_model`, `social_model`, `relationship_models`, `memory_bank`, `boundaries`, `behavioral_rules`, `decision_rules`, `scene_generation_model`, `chat_model`, and `validation`.
+
+## OOC Failure Gates
+
+Reject or revise a card before delivery when:
+
+- The first message could fit many unrelated characters.
+- Example dialogue lacks the character's concrete rhythm, vocabulary, boundaries, or relationship state.
+- The card does not explain who the character likes, fears, trusts, protects, resents, or refuses.
+- The card lacks key events and how those events changed the character.
+- Current route state is ambiguous or reset to first meeting.
+- Public/private behavior, family/friend relationships, or romance boundaries are missing.
+- Catchphrases appear without rules for when not to use them.
+- The card compresses away evidence needed to prevent OOC because of token concerns.
+
 ## Writing Rules
 
 - Use `{{char}}` and `{{user}}` macros where helpful.
 - Do not speak or act for `{{user}}`.
-- Keep examples short; demonstrate rhythm, not plot summary.
-- Prefer 2-5 examples. Each should start with `<START>`.
-- Put high-token worldbuilding in `character_book`, not permanent fields.
+- Keep examples focused; demonstrate rhythm, relationship state, boundaries, and memory under different emotional conditions.
+- Prefer 4-8 examples for high-fidelity cards. Each should start with `<START>`.
+- Put high-token worldbuilding in `character_book`, not permanent fields, but do not delete it to save tokens when fidelity matters.
 - If the user wants Chinese cards, write card prose in Chinese while keeping proper nouns unchanged.
 - For explicit source material, compress into consent, boundaries, emotional state, and consequences.
 
@@ -63,4 +96,3 @@ for path in Path("sillytavern_cards").glob("*.json"):
 print("cards passed")
 '@ | python -
 ```
-

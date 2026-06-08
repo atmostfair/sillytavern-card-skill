@@ -11,6 +11,28 @@ Create source-grounded SillyTavern Character Card V2 JSON from story text. Evide
 
 Use this skill for reusable card generation, not for generic character brainstorming. The finished card should roleplay the character faithfully without copying long canon passages.
 
+## Digital Twin First Standard
+
+Fidelity over token economy. The default goal is not a small prompt or a convenient summary; the default goal is a high-density roleplay card that behaves like a source-grounded character digital twin.
+
+OOC is a blocking failure. Do not deliver a card if the character's voice, values, memories, relationships, event history, current branch state, likes/dislikes, fears, boundaries, or decision rules are thin, generic, contradictory, or likely to drift out of character.
+
+When enough source material exists, require a strict-deep model before final card delivery:
+
+- Identity and aliases.
+- Personality, core contradictions, emotional tells, stress responses, growth arc.
+- Likes, dislikes, routines, hobbies, aesthetics, and recurring motifs.
+- Life history and event timeline with state changes.
+- Current route/relationship state, including inactive alternate branches.
+- Relationships to the protagonist, family, friends, rivals, factions, and side characters.
+- Speech model: rhythm, register, vocabulary, catchphrases, taboo phrasing, examples, and when not to overuse markers.
+- Memory bank: key scenes, private memories, unresolved threads, promises, secrets, traumas, and late-branch anchors.
+- Behavioral and decision rules for comfort, conflict, danger, intimacy, refusal, jealousy, grief, and public/private contexts.
+- OOC guardrails and hard "do not write" rules.
+- Evidence or source pointers for important claims.
+
+Do not deliver a generic scaffold. If the bundled script produces generic `first_mes`, `mes_example`, sparse lorebook entries, or a card that only contains traits, treat it as an intermediate artifact and manually deepen it before final delivery.
+
 ## Input Decision
 
 | Input available | Action |
@@ -37,6 +59,8 @@ Use this skill for reusable card generation, not for generic character brainstor
    - For each card, collect identity, role, route state, current relationship, voice markers, speech rhythm, memories, motivations, fears, refusal lines, decision rules, and "do not write" rules.
    - Separate confirmed facts from jokes, lies, dreams, virtual-only contexts, and choice-dependent branches.
    - Treat lower-affection branches as inactive unless the user requests a specific route stage.
+   - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
+   - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
 
 4. Map evidence to SillyTavern fields.
    - `description`: source-grounded identity, relationship default, and current branch.
@@ -49,6 +73,7 @@ Use this skill for reusable card generation, not for generic character brainstor
    - `alternate_greetings`: 2-4 scene starters from different emotional registers.
    - `character_book`: longer memories, world rules, relationship edges, and decision rules.
    - `extensions`: source metadata such as story version, fact counts, evidence paths, and generation notes.
+   - High-fidelity cards should use large `character_book` entries liberally. Token budget is secondary to in-character stability.
 
 5. Write compactly.
    - Use the user's language for card prose unless requested otherwise.
@@ -63,6 +88,9 @@ Use this skill for reusable card generation, not for generic character brainstor
    - Check lorebook entries are enabled and have keys.
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
    - Compare manifest coverage to the intended target characters.
+   - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
+   - Fail the card if examples sound interchangeable with another character.
+   - Fail the card if the first message could be used by a generic assistant or generic romance character.
 
 7. Iterate the skill before final response.
    - Update this skill after every task. Capture newly learned reusable experience, source-layout quirks, field-mapping improvements, validation failures, prompt-quality issues, or precautions discovered while using the skill.
@@ -105,10 +133,11 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
   --characters-dir character_skills `
   --twins-dir character_digital_twins `
   --out-dir sillytavern_cards `
-  --language zh
+  --language zh `
+  --profile fidelity
 ```
 
-The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. It is a deterministic scaffold; still inspect first messages, examples, and any character-specific nuance before delivering.
+The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
 
 Use `--character slug` repeatedly to restrict output:
 
@@ -125,10 +154,12 @@ A card is acceptable only when:
 
 - It can be imported as SillyTavern Character Card V2 JSON.
 - It preserves the active branch and does not reset the relationship to first meeting.
-- It tells the model how the character speaks now, what they remember, what they want, what they refuse, and how they choose under pressure.
+- It tells the model how the character speaks now, what they remember, what they like and dislike, what events shaped them, what they want, what they refuse, and how they choose under pressure.
+- It includes enough relationship and event history that a downstream model can answer detailed questions about the character without inventing.
 - It includes at least one opening message and example dialogue that sound like the character without quoting the source.
-- It places long memories and world rules in `character_book` instead of overloading permanent fields.
+- It places long memories, world rules, relationship maps, event timelines, and behavioral rules in `character_book`; do not remove them merely to save tokens.
 - It marks adult route material clinically as relationship state, consent, boundaries, and consequences.
+- It passes an OOC review: the card should not plausibly speak like a different cast member under ordinary chat, romance, conflict, or mission prompts.
 
 ## Common Mistakes
 
