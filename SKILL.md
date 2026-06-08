@@ -155,6 +155,8 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - Require manifest/report coverage fields for `candidate_roster`, `included`, `excluded`, `needs_review`, `gender_basis`, `story_volume_basis`, and `evidence_paths` on complete roster runs.
    - Check subagent status reports and resolve `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` before delivery.
    - Scan generated JSON for accidentally collapsed SillyTavern macros such as bare `{user}` caused by Python f-strings; generated cards should preserve `{{user}}` and `{{char}}` in visible fields, support fields, lorebook content, and encoded/generated metadata. If a generator caused the collapse, fix the generator and regenerate instead of hand-patching card JSON.
+   - When scanning for bare macro collapse, do not use a naive substring check for `{user}` or `{char}` because it also matches inside valid `{{user}}` and `{{char}}`. Use a negative-brace regex such as `(?<!\{)\{user\}(?!\})` and the matching `char` variant.
+   - If a card run also creates project-local digital twin `SKILL.md` files, verify the YAML frontmatter begins at the first byte of the file. Python `dedent` can leave leading spaces when interpolated multiline content has no common indentation, causing strict twin validation to fail even though the generated card JSON is valid.
    - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
    - Fail the card if examples sound interchangeable with another character.
    - Fail the card if the first message could be used by a generic assistant or generic romance character.
