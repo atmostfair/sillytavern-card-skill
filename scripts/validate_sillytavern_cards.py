@@ -56,6 +56,7 @@ ENTRY_OPTIONAL = {
 }
 ALLOWED_POSITIONS = {"before_char", "after_char"}
 PLACEHOLDER_RE = re.compile(r"\b(TODO|TBD|PLACEHOLDER|undefined)\b", re.I)
+BARE_MACRO_RE = re.compile(r"(?<!\{)\{(?:user|char)\}(?!\})", re.I)
 
 
 def type_name(expected: type[Any]) -> str:
@@ -141,6 +142,9 @@ def validate_card(
     placeholders = sorted(set(PLACEHOLDER_RE.findall(raw)))
     if placeholders:
         errors.append(f"{path.name}: placeholder markers found: {placeholders}")
+    bare_macros = sorted(set(BARE_MACRO_RE.findall(raw)))
+    if bare_macros:
+        errors.append(f"{path.name}: bare SillyTavern macros found, expected doubled braces: {bare_macros}")
 
     book = data.get("character_book")
     entry_count = 0
