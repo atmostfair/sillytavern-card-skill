@@ -81,6 +81,18 @@ Reject or revise a card before delivery when:
 
 ## Validation Snippet
 
+Prefer the bundled validator for generated card directories:
+
+```powershell
+python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story\scripts\validate_sillytavern_cards.py `
+  .\sillytavern_cards_fidelity `
+  --min-entries 10 `
+  --expect-profile fidelity `
+  --expect-token-budget 20000
+```
+
+Use an inline snippet only when the bundled validator is not available:
+
 ```powershell
 @'
 import json

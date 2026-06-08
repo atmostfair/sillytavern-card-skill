@@ -87,6 +87,7 @@ Do not deliver a generic scaffold. If the bundled script produces generic `first
    - Check `spec == "chara_card_v2"` and `spec_version == "2.0"`.
    - Check non-empty `name`, `description`, `personality`, `scenario`, `first_mes`, and `mes_example`.
    - Check lorebook entries are enabled and have keys.
+   - Run `scripts/validate_sillytavern_cards.py` for type-level SillyTavern V2 compatibility checks when a generated card directory exists.
    - Scan for placeholders: `TODO`, `TBD`, `PLACEHOLDER`, `undefined`, `null`.
    - Compare manifest coverage to the intended target characters.
    - Fail the card if it lacks concrete relationship maps, key events, likes/dislikes, voice rules, or branch drift guards.
@@ -140,6 +141,24 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
 ```
 
 The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. With `--seed-cards-dir`, it preserves curated visible fields from an earlier good card while replacing the knowledge layer with the high-fidelity model. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
+
+Validate generated cards with:
+
+```powershell
+python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story\scripts\validate_sillytavern_cards.py `
+  .\sillytavern_cards `
+  --min-entries 1
+```
+
+For high-fidelity generated cards, prefer stricter checks:
+
+```powershell
+python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story\scripts\validate_sillytavern_cards.py `
+  .\sillytavern_cards_fidelity `
+  --min-entries 10 `
+  --expect-profile fidelity `
+  --expect-token-budget 20000
+```
 
 Use `--character slug` repeatedly to restrict output:
 
