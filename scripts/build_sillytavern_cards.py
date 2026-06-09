@@ -31,6 +31,10 @@ TWIN_LORE_SECTIONS = [
     "likes_dislikes",
     "history",
     "life_history",
+    "indirect_mentions",
+    "mentioned_events",
+    "reputation",
+    "third_party_accounts",
     "psychological_model",
     "social_model",
     "relationships",
@@ -132,7 +136,7 @@ def profile_settings(profile: str) -> dict[str, Any]:
             "preserve_twin": False,
         }
     return {
-        "token_budget": 20000,
+        "token_budget": 50000,
         "scan_depth": 8,
         "constant_lore": True,
         "preserve_twin": True,
@@ -226,6 +230,7 @@ def build_card(
     language: str,
     profile: str,
     seed_card: dict[str, Any] | None,
+    token_budget: int | None,
 ) -> dict[str, Any]:
     markdown = read_text(skill_path)
     fm = frontmatter(markdown)
@@ -238,6 +243,8 @@ def build_card(
     facts = manifest_item.get("facts") if manifest_item else None
     dialogue_count = manifest_item.get("dialogue_line_count") if manifest_item else None
     settings = profile_settings(profile)
+    if token_budget is not None:
+        settings["token_budget"] = token_budget
 
     description = zh_or_en(
         language,
@@ -296,6 +303,7 @@ def build_card(
             "facts": facts,
             "dialogue_line_count": dialogue_count,
             "profile": profile,
+            "token_budget": settings["token_budget"],
         },
         ensure_ascii=False,
         sort_keys=True,
@@ -397,6 +405,7 @@ def main() -> None:
     parser.add_argument("--out-dir", default="sillytavern_cards", help="Output directory relative to project root.")
     parser.add_argument("--language", choices=["zh", "en"], default="zh", help="Default card prose language.")
     parser.add_argument("--profile", choices=["fidelity", "compact"], default="fidelity", help="Generation profile. fidelity preserves high-density twin.json lore and prioritizes OOC resistance over token economy.")
+    parser.add_argument("--token-budget", type=int, default=None, help="Override character_book.token_budget. This is a SillyTavern lorebook budget, not a model context-window guarantee.")
     parser.add_argument("--seed-cards-dir", default=None, help="Optional directory of existing ST V2 cards. When present, preserve curated visible calibration fields such as first_mes and mes_example while rebuilding high-density lorebook data.")
     parser.add_argument("--character", action="append", default=[], help="Character slug to generate. Repeat for multiple.")
     args = parser.parse_args()
@@ -419,7 +428,7 @@ def main() -> None:
             raise SystemExit(f"missing SKILL.md for character: {char_dir}")
         slug = char_dir.name
         seed_card = read_seed_card(seed_cards_dir, slug)
-        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language, args.profile, seed_card)
+        card = build_card(slug, skill_path, twins_dir / slug / "twin.json", manifest.get(slug), args.language, args.profile, seed_card, args.token_budget)
         file_name = f"{slug}.json"
         write_json(out_dir / file_name, card)
         rows.append(
@@ -430,6 +439,7 @@ def main() -> None:
                 "spec": card["spec"],
                 "spec_version": card["spec_version"],
                 "profile": args.profile,
+                "token_budget": card["data"]["character_book"]["token_budget"],
                 "seeded_calibration_fields": card["data"]["extensions"].get("seeded_calibration_fields", []),
             }
         )

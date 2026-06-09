@@ -41,6 +41,19 @@ Avoid human-made "safety rewrites" at the skill layer. Do not replace explicit s
 
 Accuracy still controls generation: do not invent new explicit acts, intensify beyond the source, or merge incompatible branches. Use short exact source phrases only when necessary to preserve voice or remove ambiguity; otherwise paraphrase without weakening the explicitness. Avoid long verbatim source passages for format/copyright reasons, not because the content is sexual or blunt.
 
+## Indirect Mention Evidence
+
+Do not build a character only from their direct dialogue. A character can be highly defined by what narration, other characters, profiles, logs, flashbacks, route variables, gallery/replay labels, rumors, accusations, secrets, or memories say about them.
+
+For every target, collect both:
+
+- Direct evidence: lines spoken by the character, actions shown on screen, first-person thoughts, and route choices involving them.
+- Indirect evidence: every meaningful time the character is discussed, remembered, judged, feared, desired, blamed, protected, compared, lied about, or described by someone else.
+
+Indirect evidence must be preserved in the character model when it affects reputation, relationship state, hidden motives, trauma, off-screen history, social role, family/faction position, sexual history, kink/preference signals, betrayal, jealousy, public image, or why other characters behave differently around them.
+
+For thin or easy-to-miss characters, indirect mentions can be the main reason a standalone card is viable. Store them explicitly in twin/card material as `indirect_mentions`, `mentioned_events`, `reputation`, `third_party_accounts`, `offscreen_history`, or equivalent lorebook entries. Mark confidence and speaker bias: a hostile rumor, a lover's memory, a narrator fact, and a joke are not equally reliable.
+
 ## Input Decision
 
 | Input available | Action |
@@ -114,6 +127,8 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - If `character-digital-twin-builder` output exists, use `character_digital_twins/<slug>/twin.json` as the primary knowledge object. Treat project-local character `SKILL.md` files as loaders or summaries, not as the complete model.
    - If no strict-deep twin exists for a major character, build or deepen one first when the user asks for maximum fidelity.
    - For extracted-story-only projects with no `character_skills` or existing twins, create project-local evidence/twin packages before card JSON. Use per-character dialogue/context collection, line counts, route labels, metadata, and curated fact atoms; then write cards from those twins. Do not rely on the deterministic card builder alone when its expected dossier inputs are absent.
+   - Search for target aliases in all rendered story text, narration, route metadata, relationship/profile screens, replay/gallery labels, and other characters' dialogue. Build an indirect-mention index before deciding that a character is thin or unimportant.
+   - For each important indirect mention, record who said it, where it appears, whether it is narration/profile fact or biased speech, what it implies about the target, and whether it should enter active canon, backstory, rumor, or branch-specific memory.
    - For source-only strict-deep twins, make fact atoms dense enough to audit the model. Use rendered source-unit and line references for dialogue evidence without copying large transcript text into card-visible fields just to meet evidence-count checks.
    - For strict-deep twin validators, include explicit fact atoms for `history` and `relationship` in addition to route-state and memory atoms. A rich timeline can still fail strict checks if the canonical fact-type coverage is missing.
    - If a strict-deep schema section is required but the source does not establish that domain, fill it with a source-limited absence note plus the nearest confirmed context instead of leaving it empty or inventing unsupported family/home/social facts.
@@ -135,6 +150,7 @@ For reusable subagent prompt templates and coordinator checklists, read `referen
    - `alternate_greetings`: 2-4 scene starters from different emotional registers.
    - `character_book`: longer memories, world rules, relationship edges, and decision rules.
    - `extensions`: source metadata such as story version, fact counts, evidence paths, and generation notes.
+   - Put indirect mentions and off-screen reputation in `character_book`; do not leave them only in external notes when they are needed to understand the character.
    - Sanity-check source version metadata. Some Ren'Py projects store engine tuples or internal build constants in `script_version.txt`; if the value is not a human content version, prefer a verified game folder/release label and record the raw version separately only as supporting evidence.
    - High-fidelity cards should use large `character_book` entries liberally. Token budget is secondary to in-character stability.
    - If a prior curated ST card exists, seed visible calibration fields from it (`description`, `personality`, `scenario`, `first_mes`, `mes_example`, `system_prompt`, `post_history_instructions`, `alternate_greetings`) while rebuilding the high-density lorebook from current evidence. Do not throw away a better voice calibration just because the knowledge layer is being regenerated.
@@ -212,10 +228,11 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
   --out-dir sillytavern_cards `
   --language zh `
   --profile fidelity `
+  --token-budget 50000 `
   --seed-cards-dir sillytavern_cards
 ```
 
-The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. With `--seed-cards-dir`, it preserves curated visible fields from an earlier good card while replacing the knowledge layer with the high-fidelity model. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
+The script reads `character_skills/<slug>/SKILL.md`, optionally reads `character_digital_twins/build-manifest.json` and `twin.json`, and writes ST V2 JSON plus `manifest.json`. In `--profile fidelity` mode, it preserves high-density `twin.json` sections in the character book with a large token budget. The default fidelity `character_book.token_budget` is 50000; use `--token-budget` to set a higher or lower SillyTavern lorebook budget for the run. This field is not a true unlimited context window; actual usable context is still constrained by SillyTavern, the selected model, and the backend. With `--seed-cards-dir`, it preserves curated visible fields from an earlier good card while replacing the knowledge layer with the high-fidelity model. It is still a deterministic scaffold; inspect and manually rewrite first messages, examples, and any character-specific nuance before delivering.
 
 Validate generated cards with:
 
@@ -232,7 +249,7 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
   .\sillytavern_cards_fidelity `
   --min-entries 10 `
   --expect-profile fidelity `
-  --expect-token-budget 20000
+  --expect-token-budget 50000
 ```
 
 Use `--character slug` repeatedly to restrict output:
@@ -252,6 +269,7 @@ A card is acceptable only when:
 - It preserves the active branch and does not reset the relationship to first meeting.
 - It tells the model how the character speaks now, what they remember, what they like and dislike, what events shaped them, what they want, what they refuse, and how they choose under pressure.
 - It includes enough relationship and event history that a downstream model can answer detailed questions about the character without inventing.
+- It includes important indirect mentions, reputation, off-screen history, rumors, and third-party accounts when those are needed to understand the character.
 - It includes at least one opening message and example dialogue that sound like the character without quoting the source.
 - It places long memories, world rules, relationship maps, event timelines, and behavioral rules in `character_book`; do not remove them merely to save tokens.
 - It preserves adult or explicit route material as source-grounded facts, including wording strength and concrete details when needed for characterization, relationship memory, boundaries, preference, trauma, or OOC prevention.
@@ -261,6 +279,7 @@ A card is acceptable only when:
 
 - Writing card prose before extracting facts.
 - Treating every dialogue line as confirmed truth.
+- Ignoring what other characters, narration, profiles, logs, or replay/gallery labels say about the target.
 - Flattening incompatible branches into one canon.
 - Generating cards for every named character when the user asked for main characters.
 - Copying long canon text into `mes_example`.

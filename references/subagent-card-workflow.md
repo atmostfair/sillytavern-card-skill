@@ -24,6 +24,8 @@ The coordinator owns global consistency and final delivery. Do not delegate thes
    - Existing `character_skills/<slug>/SKILL.md`.
    - Existing `character_digital_twins/<slug>/twin.json`.
    - Prior seed card path for the same slug, if any.
+   - Direct dialogue/actions involving the target.
+   - Indirect mentions: narration, profiles, logs, route variables, memories, gallery/replay labels, and other characters' comments about the target.
    - Relationship facts involving other characters, summarized narrowly.
    - Known voice markers and OOC risks.
 
@@ -55,6 +57,7 @@ Substantial evidence signals:
 - Has recurring dialogue with the protagonist.
 - Has relationship state changes, secrets, trauma, family/faction context, or route consequences.
 - Has enough direct or indirect evidence to produce non-generic voice and decision rules.
+- Is repeatedly discussed, remembered, feared, desired, blamed, protected, or judged by others even if direct appearances are limited.
 
 Exclusion signals:
 
@@ -76,6 +79,7 @@ Use scoring to make the inclusion decision auditable. A candidate should usually
 | Independent route, romance, PAX, affection, gallery, replay, or ending state | 3 |
 | Project-local character dossier or digital twin exists | 3 |
 | Recurring direct dialogue with protagonist across multiple scenes | 2 |
+| Recurring indirect mentions, reputation, memories, or accusations from multiple sources | 2 |
 | Relationship state changes over time | 2 |
 | Major world, faction, family, team, or main-plot influence | 2 |
 | Distinct voice markers, catchphrases, register, or emotional pattern | 1 |
@@ -87,6 +91,7 @@ Subtract or exclude when:
 | --- | --- |
 | Only mentioned by name | Exclude |
 | One-scene cameo with no durable relationship | Exclude |
+| Mentioned often but only as a label with no behavior, relationship, or reputation detail | Usually exclude or lorebook-only |
 | Alternate disguise/virtual identity of an included character | Merge unless user wants separate card |
 | Gender cannot be established from evidence | Put in `needs_review` |
 | Too little evidence to avoid generic behavior | Exclude with reason |
@@ -156,6 +161,10 @@ Inputs:
 [LIST PATHS]
 - Target fact IDs / source notes:
 [LIST FACT IDS OR NOTES]
+- Direct evidence:
+[LIST DIALOGUE / ACTION / ON-SCREEN EVIDENCE]
+- Indirect mention evidence:
+[LIST NARRATION / PROFILE / LOG / MEMORY / GALLERY / THIRD-PARTY COMMENTS]
 - Protagonist relationship default:
 [PASTE CURRENT RELATIONSHIP STATE]
 - Language policy:
@@ -170,6 +179,7 @@ Inputs:
 Rules:
 - Work only on [CHARACTER].
 - Use other characters only as relationship context for [CHARACTER].
+- Treat indirect mentions as first-class evidence. Record speaker/narrator, bias, reliability, implied fact, and whether the mention belongs to active canon, rumor, backstory, or branch-specific memory.
 - Do not freely explore the whole project. Ask for specific missing target evidence with `NEEDS_CONTEXT`.
 - Do not copy long canon passages, but do preserve the source's explicitness level and wording strength.
 - Do not speak or act for {{user}}.
@@ -202,8 +212,19 @@ Prefer this response shape when subagents return drafts instead of writing files
   "source_coverage": {
     "evidence_paths": [],
     "fact_ids": [],
+    "direct_evidence_count": 0,
+    "indirect_mention_count": 0,
     "missing_or_thin_areas": []
   },
+  "indirect_mentions": [
+    {
+      "source": "",
+      "speaker_or_narrator": "",
+      "reliability": "confirmed|biased|rumor|joke|branch_specific",
+      "implied_fact": "",
+      "card_usage": ""
+    }
+  ],
   "assumptions": {
     "active_branch": "",
     "relationship_state": "",
@@ -242,6 +263,7 @@ If the source treats the protagonist as a flexible player projection, set the pr
 The coordinator must reject or revise a returned card when:
 
 - It omits a major relationship or route event.
+- It ignores important indirect mentions, reputation, off-screen history, or third-party accounts that explain the target.
 - It treats the protagonist as a stranger when the selected state is late-route.
 - It copies another character's catchphrases or emotional posture.
 - It collapses incompatible branches into one active canon without warning.
@@ -266,6 +288,7 @@ Inputs:
 Check:
 - The protagonist card exists unless this is an explicitly partial run.
 - All qualifying female characters are included or have a concrete exclusion reason.
+- Characters with low direct dialogue but high indirect evidence have been reviewed instead of silently dropped.
 - Shared events, route state, names, aliases, and relationship stages agree across cards.
 - Each card has distinct voice, emotional logic, boundaries, and example dialogue.
 - No card copied another card's catchphrases or generic romance/assistant phrasing.

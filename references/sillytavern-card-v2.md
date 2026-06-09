@@ -36,7 +36,7 @@ Recommended optional fields: `creator_notes`, `system_prompt`, `post_history_ins
 
 ## High-Fidelity Profile
 
-For digital-twin cards, token budget is secondary. Prefer a larger, more reliable card over a compact card that drifts OOC. Use `character_book.token_budget` in the 8000-20000 range when the target model and SillyTavern setup can tolerate it.
+For digital-twin cards, token budget is secondary. Prefer a larger, more reliable card over a compact card that drifts OOC. `character_book.token_budget` is a SillyTavern lorebook activation budget, not the real model context limit. Use a high value such as 50000 by default for fidelity cards, and raise it with the builder's `--token-budget` option when the target model and SillyTavern setup can tolerate it.
 
 High-fidelity cards should include:
 
@@ -51,8 +51,9 @@ High-fidelity cards should include:
 - Behavioral decision rules and refusal rules.
 - Hard OOC guardrails.
 - Source metadata or fact IDs for important claims.
+- Indirect mentions, off-screen reputation, third-party accounts, and mentioned events when they shape the character.
 
-If `character_digital_twins/<slug>/twin.json` exists, preserve the high-value nested sections in `character_book` instead of flattening them away. Important sections usually include `identity`, `personality`, `voice`, `likes_dislikes`, `life_history`, `psychological_model`, `social_model`, `relationship_models`, `memory_bank`, `boundaries`, `behavioral_rules`, `decision_rules`, `scene_generation_model`, `chat_model`, and `validation`.
+If `character_digital_twins/<slug>/twin.json` exists, preserve the high-value nested sections in `character_book` instead of flattening them away. Important sections usually include `identity`, `personality`, `voice`, `likes_dislikes`, `life_history`, `indirect_mentions`, `mentioned_events`, `reputation`, `third_party_accounts`, `psychological_model`, `social_model`, `relationship_models`, `memory_bank`, `boundaries`, `behavioral_rules`, `decision_rules`, `scene_generation_model`, `chat_model`, and `validation`.
 
 When an earlier ST card has stronger manually curated visible calibration, keep those visible fields and regenerate the knowledge layer. Good seed fields are `description`, `personality`, `scenario`, `first_mes`, `mes_example`, `system_prompt`, `post_history_instructions`, and `alternate_greetings`. This is especially useful when a deterministic script can preserve facts but cannot yet write character-specific openings as well as a manual pass.
 
@@ -64,6 +65,7 @@ Reject or revise a card before delivery when:
 - Example dialogue lacks the character's concrete rhythm, vocabulary, boundaries, or relationship state.
 - The card does not explain who the character likes, fears, trusts, protects, resents, or refuses.
 - The card lacks key events and how those events changed the character.
+- The card omits meaningful indirect mentions or off-screen reputation for a character who is mostly understood through other people's comments, memories, accusations, or profiles.
 - Current route state is ambiguous or reset to first meeting.
 - Public/private behavior, family/friend relationships, or romance boundaries are missing.
 - Catchphrases appear without rules for when not to use them.
@@ -93,7 +95,7 @@ python C:\Users\Quaternijkon\.codex\skills\generate-sillytavern-cards-from-story
   .\sillytavern_cards_fidelity `
   --min-entries 10 `
   --expect-profile fidelity `
-  --expect-token-budget 20000
+  --expect-token-budget 50000
 ```
 
 Use an inline snippet only when the bundled validator is not available:
